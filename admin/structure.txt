@@ -1,0 +1,17 @@
+/admin
+  /assets
+    /css
+      style.css      <-- เก็บ CSS ส่วนกลาง
+    /js
+      admin.js       <-- เก็บ AJAX Logic (Categories/Products)
+  /includes
+    header.php       <-- รวม <head>, Bootstrap, DataTables, SweetAlert
+    navbar.php       <-- แถบบน (Breadcrumb + Profile)
+    sidebar.php      <-- เมนูด้านซ้าย
+    footer.php       <-- ปิด Tag และรวม JS Files
+  /api
+    category_api.php <-- รับค่า AJAX และจัดการ DB (CRUD)
+    product_api.php  <-- รับค่า AJAX และจัดการ DB (CRUD)
+  index.php          <-- หน้าหลัก
+  categories.php     <-- หน้าจัดการหมวดหมู่ (ใช้ AJAX)
+  products.php       <-- หน้าจัดการสินค้า (ใช้ AJAX)

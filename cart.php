@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ตะกร้าสินค้า - IT Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .img-cart {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .total-row {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body class="bg-light p-4">
+    <div class="container">
+        <div class="card shadow-sm border-0 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4><i class="bi bi-cart3"></i> ตะกร้าสินค้าของคุณ</h4>
+                <a href="index.php" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> กลับไปเลือกสินค้า</a>
+            </div>
+
+            <table id="cartTable" class="table align-middle w-100">
+                <thead class="table-light">
+                    <tr>
+                        <th>รูปภาพ</th>
+                        <th>ประเภท</th>
+                        <th>ยี่ห้อ</th>
+                        <th>รุ่น</th>
+                        <th>Model</th>
+                        <th>ราคาต่อหน่วย</th>
+                        <th width="120">จำนวน</th>
+                        <th>ราคารวม</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-list">
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="7" class="text-end">ราคารวมสุทธิทั้งหมด:</td>
+                        <td id="grand-total" class="text-danger">฿0</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="text-end mt-4">
+                <button class="btn btn-danger" onclick="clearCart()"><i class="bi bi-trash"></i> ล้างตะกร้า</button>
+                <button class="btn btn-success px-5" onclick="checkout()"><i class="bi bi-check-circle"></i> ยืนยันรายการ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        let cartTable;
+
+        function renderCart() {
+            let cart = Cookies.get('it_shop_cart') ? JSON.parse(Cookies.get('it_shop_cart')) : [];
+            let html = '';
+            let grandTotal = 0;
+
+            cart.forEach((item, idx) => {
+                let subtotal = item.price * item.qty;
+                grandTotal += subtotal;
+                html += `
+                <tr>
+                    <td><img src="${item.img || 'https://via.placeholder.com/60'}" class="img-cart shadow-sm"></td>
+                    <td><span class="badge bg-secondary">${item.category_name || 'ทั่วไป'}</span></td>
+                    <td>${item.brand_name}</td>
+                    <td>${item.version}</td>
+                    <td><small class="text-muted">${item.model}</small></td>
+                    <td>฿${parseFloat(item.price).toLocaleString()}</td>
+                    <td>
+                        <div class="input-group input-group-sm">
+                            <button class="btn btn-outline-dark" onclick="changeQty(${idx}, -1)">-</button>
+                            <input type="text" class="form-control text-center bg-white" value="${item.qty}" readonly>
+                            <button class="btn btn-outline-dark" onclick="changeQty(${idx}, 1)">+</button>
+                        </div>
+                    </td>
+                    <td class="fw-bold">฿${subtotal.toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeItem(${idx})">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+
+            if ($.fn.DataTable.isDataTable('#cartTable')) {
+                cartTable.destroy();
+            }
+
+            $('#cart-list').html(html);
+            $('#grand-total').text('฿' + grandTotal.toLocaleString());
+
+            cartTable = $('#cartTable').DataTable({
+                pageLength: 50,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/th.json'
+                },
+                columnDefs: [{
+                    orderable: false,
+                    targets: [0, 6, 8]
+                }]
+            });
+        }
+
+        function changeQty(idx, delta) {
+            let cart = JSON.parse(Cookies.get('it_shop_cart'));
+            cart[idx].qty += delta;
+            if (cart[idx].qty <= 0) {
+                removeItem(idx);
+            } else {
+                Cookies.set('it_shop_cart', JSON.stringify(cart), {
+                    expires: 0.5
+                });
+                renderCart();
+            }
+        }
+
+        function removeItem(idx) {
+            let cart = JSON.parse(Cookies.get('it_shop_cart'));
+            cart.splice(idx, 1);
+            Cookies.set('it_shop_cart', JSON.stringify(cart), {
+                expires: 0.5
+            });
+            renderCart();
+        }
+
+        function clearCart() {
+            Swal.fire({
+                title: 'ล้างตะกร้า?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ล้างเลย'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    Cookies.remove('it_shop_cart');
+                    renderCart();
+                }
+            });
+        }
+
+        $(document).ready(renderCart);
+    </script>
+</body>
+
+</html>
