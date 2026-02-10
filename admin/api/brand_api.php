@@ -6,7 +6,7 @@ $term = $_GET['term'] ?? '';
 
 if (strlen($term) >= 3) {
     // ค้นหายี่ห้อที่คล้ายกับที่พิมพ์
-    $stmt = $pdo->prepare("SELECT brand_name FROM brands WHERE brand_name LIKE ? LIMIT 5");
+    $stmt = $pdo->prepare("SELECT brand_name FROM brands WHERE brand_name LIKE ? ORDER BY brand_name ASC LIMIT 10");
     $stmt->execute(["%$term%"]);
     $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode($brands);

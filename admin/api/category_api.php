@@ -5,7 +5,7 @@ require_once '../../db.php'; // ปรับ Path ตามโครงสร้
 $action = $_GET['action'] ?? '';
 
 if ($action == 'list') {
-    $stmt = $pdo->query("SELECT * FROM categories ORDER BY id DESC");
+    $stmt = $pdo->query("SELECT * FROM categories ORDER BY category_name ASC");
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode(['data' => $data]);
 } elseif ($action == 'add') {

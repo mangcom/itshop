@@ -47,84 +47,170 @@ $(document).ready(function () {
 });
 
 // ฟังก์ชันดูรายละเอียดใน Modal
+// function viewDetail(id) {
+//   $.getJSON(`admin/api/product_api.php?action=get&id=${id}`, function (res) {
+//     if (res.status === "success") {
+//       let p = res.data;
+
+//       // ตรวจสอบการ Parse JSON ของ specifications
+//       let specDetail = "ไม่มีข้อมูลเพิ่มเติม";
+//       try {
+//         if (p.specifications) {
+//           let specObj = JSON.parse(p.specifications);
+//           specDetail = specObj.detail || p.specifications;
+//         }
+//       } catch (e) {
+//         specDetail = p.specifications;
+//       }
+
+//       let html = `
+//                 <div class="modal-header">
+//                     <h5 class="modal-title">รายละเอียดสินค้า: ${p.brand_name}</h5>
+//                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+//                 </div>
+//                 <div class="modal-body">
+//                     <div class="row">
+//                         <div class="col-md-5 text-center">
+//                             <img src="${p.image_path || "https://via.placeholder.com/400x300?text=No+Image"}"
+//                                  class="img-fluid rounded shadow-sm mb-3" style="max-height: 300px;">
+//                         </div>
+//                         <div class="col-md-7">
+//                             <h4 class="text-primary">${p.brand_name}</h4>
+//                             <h5 class="mb-3">${p.version}</h5>
+
+//                             <table class="table table-sm border-0">
+//                                 <tr>
+//                                     <td width="30%" class="text-muted">ประเภท:</td>
+//                                     <td><strong>${p.category_name || "ไม่ระบุ"}</strong></td>
+//                                 </tr>
+//                                 <tr>
+//                                     <td class="text-muted">รุ่น (Version):</td>
+//                                     <td>${p.version || "-"}</td>
+//                                 </tr>
+//                                 <tr>
+//                                     <td class="text-muted">Model:</td>
+//                                     <td><code>${p.model || "-"}</code></td>
+//                                 </tr>
+//                                 <tr>
+//                                     <td class="text-muted">ราคาต่อหน่วย:</td>
+//                                     <td><span class="text-danger h4">฿${parseFloat(p.price).toLocaleString()}</span></td>
+//                                 </tr>
+//                             </table>
+
+//                             <hr>
+//                             <h6>คุณสมบัติ/สเปก:</h6>
+//                             <p class="text-muted small" style="white-space: pre-line;">${specDetail}</p>
+
+//                             <div class="d-grid gap-2 mt-4">
+//                                 ${
+//                                   p.datasheet_path
+//                                     ? `<a href="${p.datasheet_path}" target="_blank" class="btn btn-outline-info">
+//                                         <i class="bi bi-file-earmark-pdf"></i> ดู Specsheet (PDF)
+//                                      </a>`
+//                                     : ""
+//                                 }
+//                                 <button class="btn btn-success py-2" onclick='addToCart(${JSON.stringify(p)})'>
+//                                     <i class="bi bi-cart-plus"></i> เพิ่มเข้าตะกร้าสินค้า
+//                                 </button>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>`;
+
+//       $("#modal-content-area").html(html);
+//       $("#productDetailModal").modal("show");
+//     } else {
+//       Swal.fire("ผิดพลาด", "ไม่สามารถโหลดข้อมูลได้", "error");
+//     }
+//   });
+// }
 function viewDetail(id) {
   $.getJSON(`admin/api/product_api.php?action=get&id=${id}`, function (res) {
     if (res.status === "success") {
       let p = res.data;
 
-      // ตรวจสอบการ Parse JSON ของ specifications
-      let specDetail = "ไม่มีข้อมูลเพิ่มเติม";
-      try {
-        if (p.specifications) {
+      // --- จัดการคุณสมบัติให้เป็น Bullet พร้อมรองรับการจัดข้อความเยื้อง (Indentation) ---
+      let specHtml = "<li style='margin-bottom: 8px;'>ไม่มีข้อมูลเพิ่มเติม</li>";
+      if (p.specifications) {
+        try {
           let specObj = JSON.parse(p.specifications);
-          specDetail = specObj.detail || p.specifications;
+          let rawText = specObj.detail || p.specifications;
+          let lines = rawText
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0);
+
+          if (lines.length > 0) {
+            // ใช้ CSS text-indent เพื่อดันบรรทัดที่ 2 เป็นต้นไปให้เยื้องเข้าไป
+            specHtml = lines
+              .map(
+                (line) =>
+                  `<li style="padding-left: 1.5em; text-indent: -1em; margin-bottom: 8px;">
+                                - ${line}
+                            </li>`,
+              )
+              .join("");
+          }
+        } catch (e) {
+          specHtml = `<li style="padding-left: 1.5em; text-indent: -1em;">- ${p.specifications}</li>`;
         }
-      } catch (e) {
-        specDetail = p.specifications;
       }
 
       let html = `
-                <div class="modal-header">
+                <div class="modal-header bg-light">
                     <h5 class="modal-title">รายละเอียดสินค้า: ${p.brand_name}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
+                    <div class="row mb-4">
                         <div class="col-md-5 text-center">
                             <img src="${p.image_path || "https://via.placeholder.com/400x300?text=No+Image"}" 
-                                 class="img-fluid rounded shadow-sm mb-3" style="max-height: 300px;">
+                                 class="img-fluid rounded shadow-sm" style="max-height: 250px; object-fit: contain;">
                         </div>
                         <div class="col-md-7">
-                            <h4 class="text-primary">${p.brand_name}</h4>
-                            <h5 class="mb-3">${p.version}</h5>
-                            
-                            <table class="table table-sm border-0">
-                                <tr>
-                                    <td width="30%" class="text-muted">ประเภท:</td>
-                                    <td><strong>${p.category_name || "ไม่ระบุ"}</strong></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted">รุ่น (Version):</td>
-                                    <td>${p.version || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted">Model:</td>
-                                    <td><code>${p.model || "-"}</code></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted">ราคาต่อหน่วย:</td>
-                                    <td><span class="text-danger h4">฿${parseFloat(p.price).toLocaleString()}</span></td>
-                                </tr>
-                            </table>
+                            <h4 class="text-primary fw-bold">${p.brand_name}</h4>
+                            <h5 class="text-secondary">${p.version}</h5>
+                            <p class="text-muted mb-1">Model: <code>${p.model}</code></p>
+                            <p class="text-muted mb-1">ประเภท: <strong>${p.category_name || "ไม่ระบุ"}</strong></p>
+                            <h3 class="text-danger fw-bold mt-3">฿${parseFloat(p.price).toLocaleString()}</h3>
+                        </div>
+                    </div>
 
-                            <hr>
-                            <h6>คุณสมบัติ/สเปก:</h6>
-                            <p class="text-muted small" style="white-space: pre-line;">${specDetail}</p>
-                            
-                            <div class="d-grid gap-2 mt-4">
-                                ${
-                                  p.datasheet_path
-                                    ? `<a href="${p.datasheet_path}" target="_blank" class="btn btn-outline-info">
-                                        <i class="bi bi-file-earmark-pdf"></i> ดู Specsheet (PDF)
-                                     </a>`
-                                    : ""
-                                }
-                                <button class="btn btn-success py-2" onclick='addToCart(${JSON.stringify(p)})'>
-                                    <i class="bi bi-cart-plus"></i> เพิ่มเข้าตะกร้าสินค้า
-                                </button>
-                            </div>
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-12 px-4">
+                            <h6 class="fw-bold mb-3"><i class="bi bi-list-ul"></i> คุณสมบัติสินค้า:</h6>
+                            <ul class="list-unstyled mt-2" style="line-height: 1.6; color: #444;">
+                                ${specHtml}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <div class="row w-100">
+                        <div class="col-6">
+                            ${
+                              p.datasheet_path
+                                ? `<a href="${p.datasheet_path}" target="_blank" class="btn btn-outline-info w-100">
+                                    <i class="bi bi-file-earmark-pdf"></i> Datasheet
+                                 </a>`
+                                : `<button class="btn btn-outline-secondary w-100" disabled>ไม่มี Datasheet</button>`
+                            }
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-success w-100" onclick='addToCart(${JSON.stringify(p)})'>
+                                <i class="bi bi-cart-plus"></i> เพิ่มลงตะกร้า
+                            </button>
                         </div>
                     </div>
                 </div>`;
 
       $("#modal-content-area").html(html);
       $("#productDetailModal").modal("show");
-    } else {
-      Swal.fire("ผิดพลาด", "ไม่สามารถโหลดข้อมูลได้", "error");
     }
   });
 }
-
 // ระบบตะกร้าสินค้า (Cookie 12 ชั่วโมง)
 function addToCart(product) {
   let cart = Cookies.get("it_shop_cart");

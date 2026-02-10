@@ -39,47 +39,88 @@ $(document).ready(function () {
 
   // === 2. การจัดการรายการสินค้า (Products) ===
   if ($("#productTable").length > 0) {
+    // let productTable = $("#productTable").DataTable({
+    //   ajax: "api/product_api.php?action=list",
+    //   order: [
+    //     [4, "asc"],
+    //     [1, "asc"],
+    //     [2, "asc"],
+    //     [3, "asc"],
+    //   ],
+    //   columns: [
+    //     {
+    //       data: "image_path",
+    //       render: function (data) {
+    //         return data ? `<img src="../${data}" width="50" class="img-thumbnail shadow-sm">` : `<span class="text-muted small">ไม่มีรูป</span>`;
+    //       },
+    //     },
+    //     { data: "brand_name" },
+    //     { data: "version" },
+    //     { data: "model" },
+    //     { data: "category_name" },
+    //     {
+    //       data: "price",
+    //       render: function (data) {
+    //         return "<strong>" + parseFloat(data).toLocaleString() + "</strong> .-";
+    //       },
+    //     },
+    //     {
+    //       data: null,
+    //       render: function (data) {
+    //         let btn = `
+    //                         <div class="btn-group">
+    //                             <button class="btn btn-sm btn-warning" onclick="editProduct(${data.id})">
+    //                                 <i class="bi bi-pencil"></i>
+    //                             </button>
+    //                             <button class="btn btn-sm btn-danger" onclick="deleteProduct(${data.id})">
+    //                                 <i class="bi bi-trash"></i>
+    //                             </button>`;
+    //         if (data.datasheet_path) {
+    //           btn += ` <a href="../${data.datasheet_path}" target="_blank" class="btn btn-sm btn-info">
+    //                                     <i class="bi bi-file-earmark-pdf"></i>
+    //                                  </a>`;
+    //         }
+    //         btn += `</div>`;
+    //         return btn;
+    //       },
+    //     },
+    //   ],
+    //   language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/th.json" },
+    // });
     let productTable = $("#productTable").DataTable({
-      ajax: "api/product_api.php?action=list",
+      ajax: "api/product_api.php?action=list_all", // เปลี่ยนไปใช้ action ที่ดึงทั้งหมดรวมที่ลบแล้ว
       columns: [
-        {
-          data: "image_path",
-          render: function (data) {
-            return data ? `<img src="../${data}" width="50" class="img-thumbnail shadow-sm">` : `<span class="text-muted small">ไม่มีรูป</span>`;
-          },
-        },
+        { data: "image_path", render: (data) => (data ? `<img src="../${data}" width="50">` : "ไม่มีรูป") },
         { data: "brand_name" },
         { data: "version" },
         { data: "model" },
         { data: "category_name" },
+        { data: "price", render: (data) => parseFloat(data).toLocaleString() },
         {
-          data: "price",
+          data: "deleted_at",
           render: function (data) {
-            return "<strong>" + parseFloat(data).toLocaleString() + "</strong> .-";
+            return data ? `<span class="badge bg-danger">ถูกลบเมื่อ ${data}</span>` : `<span class="badge bg-success">ปกติ</span>`;
           },
         },
         {
           data: null,
           render: function (data) {
-            let btn = `
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-warning" onclick="editProduct(${data.id})">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${data.id})">
-                                    <i class="bi bi-trash"></i>
-                                </button>`;
-            if (data.datasheet_path) {
-              btn += ` <a href="../${data.datasheet_path}" target="_blank" class="btn btn-sm btn-info">
-                                        <i class="bi bi-file-earmark-pdf"></i>
-                                     </a>`;
+            if (data.deleted_at) {
+              return `<button class="btn btn-sm btn-info" onclick="restoreProduct(${data.id})"><i class="bi bi-arrow-counterclockwise"></i> กู้คืน</button>`;
             }
-            btn += `</div>`;
-            return btn;
+            return `
+                    <button class="btn btn-sm btn-warning" onclick="editProduct(${data.id})"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteProduct(${data.id})"><i class="bi bi-trash"></i></button>
+                `;
           },
         },
       ],
-      language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/th.json" },
+      order: [
+        [4, "asc"],
+        [1, "asc"],
+        [2, "asc"],
+        [3, "asc"],
+      ], // เรียงลำดับตามเงื่อนไขคุณ
     });
 
     // บันทึก/แก้ไขสินค้า (รองรับไฟล์)
@@ -226,6 +267,16 @@ function deleteCat(id) {
         },
         "json",
       );
+    }
+  });
+}
+
+// ฟังก์ชันกู้คืนข้อมูล
+function restoreProduct(id) {
+  $.post("api/product_api.php?action=restore", { id: id }, function (res) {
+    if (res.status === "success") {
+      Swal.fire("กู้คืนแล้ว", "รายการสินค้ากลับมาใช้งานได้ปกติ", "success");
+      productTable.ajax.reload();
     }
   });
 }

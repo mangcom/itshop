@@ -3,7 +3,7 @@
 <?php require_once 'includes/sidebar.php'; ?>
 <?php
 require_once dirname(__DIR__) . '/db.php';
-$cats = $pdo->query("SELECT * FROM categories")->fetchAll();
+$cats = $pdo->query("SELECT * FROM categories ORDER BY category_name ASC")->fetchAll();
 $brands = $pdo->query("SELECT * FROM brands")->fetchAll();
 ?>
 
@@ -26,6 +26,7 @@ $brands = $pdo->query("SELECT * FROM brands")->fetchAll();
                             <th>Model</th>
                             <th>หมวดหมู่</th>
                             <th>ราคา</th>
+                            <th width="10%">สถานะ</th>
                             <th width="15%">จัดการ</th>
                         </tr>
                     </thead>
