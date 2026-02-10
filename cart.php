@@ -21,6 +21,7 @@
             font-size: 1.1rem;
         }
     </style>
+
 </head>
 
 <body class="bg-light p-4">
@@ -57,12 +58,17 @@
             </table>
 
             <div class="text-end mt-4">
+                <button class="btn btn-outline-primary" onclick="exportPDF()">
+                    <i class="bi bi-file-earmark-pdf"></i> Export เป็น PDF
+                </button>
                 <button class="btn btn-danger" onclick="clearCart()"><i class="bi bi-trash"></i> ล้างตะกร้า</button>
                 <button class="btn btn-success px-5" onclick="checkout()"><i class="bi bi-check-circle"></i> ยืนยันรายการ</button>
             </div>
         </div>
     </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
@@ -160,6 +166,72 @@
         }
 
         $(document).ready(renderCart);
+
+        // function exportPDF() {
+        //     const {
+        //         jsPDF
+        //     } = window.jspdf;
+        //     const doc = new jsPDF();
+
+        //     // ตั้งค่าฟอนต์ (เนื่องจาก PDF มาตรฐานไม่รองรับไทย ต้องใช้การตั้งค่าพิเศษหรือใช้ Canvas)
+        //     // ในที่นี้จะใช้การดึงข้อมูลจากตาราง HTML โดยตรง
+
+        //     doc.text("รายการสินค้าที่เลือก (IT SHOP)", 14, 15);
+
+        //     // ดึงข้อมูลจาก Cookie
+        //     let cart = Cookies.get('it_shop_cart') ? JSON.parse(Cookies.get('it_shop_cart')) : [];
+
+        //     if (cart.length === 0) {
+        //         Swal.fire('ผิดพลาด', 'ไม่มีสินค้าในตะกร้าสำหรับ Export', 'error');
+        //         return;
+        //     }
+
+        //     let body = [];
+        //     let grandTotal = 0;
+
+        //     cart.forEach((item, index) => {
+        //         let subtotal = item.price * item.qty;
+        //         grandTotal += subtotal;
+        //         body.push([
+        //             index + 1,
+        //             item.category_name,
+        //             `${item.brand_name} ${item.version}`,
+        //             item.model,
+        //             parseFloat(item.price).toLocaleString(),
+        //             item.qty,
+        //             subtotal.toLocaleString()
+        //         ]);
+        //     });
+
+        //     // สร้างตารางใน PDF
+        //     doc.autoTable({
+        //         startY: 20,
+        //         head: [
+        //             ['#', 'ประเภท', 'รายการ', 'Model', 'ราคา/หน่วย', 'จำนวน', 'ราคารวม']
+        //         ],
+        //         body: body,
+        //         foot: [
+        //             ['', '', '', '', '', 'ราคารวมสุทธิ', grandTotal.toLocaleString() + ' บาท']
+        //         ],
+        //         styles: {
+        //             font: 'courier',
+        //             fontSize: 8
+        //         }, // หมายเหตุ: Courier ไม่รองรับไทยโดยตรง
+        //         theme: 'grid'
+        //     });
+
+        //     doc.save(`it-shop-cart-${Date.now()}.pdf`);
+        // }
+        function exportPDF() {
+            // ซ่อนปุ่มต่างๆ ก่อนพิมพ์
+            const originalHeader = document.title;
+            document.title = "รายการสั่งซื้อสินค้า_IT_SHOP";
+
+            // ใช้คำสั่งพิมพ์ของ Browser
+            window.print();
+
+            document.title = originalHeader;
+        }
     </script>
 </body>
 
