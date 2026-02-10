@@ -58,9 +58,12 @@
             </table>
 
             <div class="text-end mt-4">
-                <button class="btn btn-outline-primary" onclick="exportPDF()">
+                <!-- <button class="btn btn-outline-primary" onclick="exportPDF()">
                     <i class="bi bi-file-earmark-pdf"></i> Export เป็น PDF
-                </button>
+                </button> -->
+                <a href="export_pdf.php" target="_blank" class="btn btn-outline-primary">
+                    <i class="bi bi-file-earmark-pdf"></i> Export เป็น PDF
+                </a>
                 <button class="btn btn-danger" onclick="clearCart()"><i class="bi bi-trash"></i> ล้างตะกร้า</button>
                 <button class="btn btn-success px-5" onclick="checkout()"><i class="bi bi-check-circle"></i> ยืนยันรายการ</button>
             </div>
