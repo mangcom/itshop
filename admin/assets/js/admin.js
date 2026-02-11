@@ -212,8 +212,19 @@ function editProduct(id) {
       $('input[name="model"]').val(p.model);
       $('input[name="price"]').val(p.price);
       $('input[name="unit"]').val(p.unit);
-      $('textarea[name="specifications"]').val(p.specifications);
-
+      let specValue = p.specifications;
+      try {
+        // ลองตรวจสอบว่าเป็น JSON หรือไม่
+        let specObj = JSON.parse(p.specifications);
+        // ถ้าเป็น Object และมี key ชื่อ detail ให้ดึงค่าออกมา
+        if (typeof specObj === "object" && specObj !== null && specObj.detail) {
+          specValue = specObj.detail;
+        }
+      } catch (e) {
+        // ถ้าไม่ใช่ JSON (เช่นเป็นข้อความธรรมดา) ให้ใช้ค่าเดิม
+        specValue = p.specifications;
+      }
+      $('textarea[name="specifications"]').val(specValue);
       $(".modal-title").text("แก้ไขข้อมูลสินค้า");
       $("#productModal").modal("show");
     }
