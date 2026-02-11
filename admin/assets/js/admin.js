@@ -15,6 +15,7 @@ $(document).ready(function () {
           },
         },
       ],
+      order: [[1, "asc"]],
       language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/th.json" },
     });
 
@@ -27,7 +28,14 @@ $(document).ready(function () {
         data: $(this).serialize(),
         success: function (response) {
           if (response.status === "success") {
-            Swal.fire("สำเร็จ!", "เพิ่มหมวดหมู่เรียบร้อยแล้ว", "success");
+            // ปรับปรุง: หายไปเองใน 1 วินาที
+            Swal.fire({
+              icon: "success",
+              title: "สำเร็จ!",
+              text: "เพิ่มหมวดหมู่เรียบร้อยแล้ว",
+              timer: 1000,
+              showConfirmButton: false,
+            });
             $("#catModal").modal("hide");
             $("#addCatForm")[0].reset();
             catTable.ajax.reload();
@@ -39,56 +47,8 @@ $(document).ready(function () {
 
   // === 2. การจัดการรายการสินค้า (Products) ===
   if ($("#productTable").length > 0) {
-    // let productTable = $("#productTable").DataTable({
-    //   ajax: "api/product_api.php?action=list",
-    //   order: [
-    //     [4, "asc"],
-    //     [1, "asc"],
-    //     [2, "asc"],
-    //     [3, "asc"],
-    //   ],
-    //   columns: [
-    //     {
-    //       data: "image_path",
-    //       render: function (data) {
-    //         return data ? `<img src="../${data}" width="50" class="img-thumbnail shadow-sm">` : `<span class="text-muted small">ไม่มีรูป</span>`;
-    //       },
-    //     },
-    //     { data: "brand_name" },
-    //     { data: "version" },
-    //     { data: "model" },
-    //     { data: "category_name" },
-    //     {
-    //       data: "price",
-    //       render: function (data) {
-    //         return "<strong>" + parseFloat(data).toLocaleString() + "</strong> .-";
-    //       },
-    //     },
-    //     {
-    //       data: null,
-    //       render: function (data) {
-    //         let btn = `
-    //                         <div class="btn-group">
-    //                             <button class="btn btn-sm btn-warning" onclick="editProduct(${data.id})">
-    //                                 <i class="bi bi-pencil"></i>
-    //                             </button>
-    //                             <button class="btn btn-sm btn-danger" onclick="deleteProduct(${data.id})">
-    //                                 <i class="bi bi-trash"></i>
-    //                             </button>`;
-    //         if (data.datasheet_path) {
-    //           btn += ` <a href="../${data.datasheet_path}" target="_blank" class="btn btn-sm btn-info">
-    //                                     <i class="bi bi-file-earmark-pdf"></i>
-    //                                  </a>`;
-    //         }
-    //         btn += `</div>`;
-    //         return btn;
-    //       },
-    //     },
-    //   ],
-    //   language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/th.json" },
-    // });
     let productTable = $("#productTable").DataTable({
-      ajax: "api/product_api.php?action=list_all", // เปลี่ยนไปใช้ action ที่ดึงทั้งหมดรวมที่ลบแล้ว
+      ajax: "api/product_api.php?action=list_all",
       columns: [
         { data: "image_path", render: (data) => (data ? `<img src="../${data}" width="50">` : "ไม่มีรูป") },
         { data: "brand_name" },
@@ -120,10 +80,10 @@ $(document).ready(function () {
         [1, "asc"],
         [2, "asc"],
         [3, "asc"],
-      ], // เรียงลำดับตามเงื่อนไขคุณ
+      ],
     });
 
-    // บันทึก/แก้ไขสินค้า (รองรับไฟล์)
+    // บันทึก/แก้ไขสินค้า
     $("#addProductForm").on("submit", function (e) {
       e.preventDefault();
       let formData = new FormData(this);
@@ -136,10 +96,17 @@ $(document).ready(function () {
         processData: false,
         success: function (res) {
           if (res.status === "success") {
-            Swal.fire("สำเร็จ", res.message, "success");
+            // ปรับปรุง: หายไปเองใน 1 วินาที
+            Swal.fire({
+              icon: "success",
+              title: "สำเร็จ",
+              text: res.message,
+              timer: 1000,
+              showConfirmButton: false,
+            });
             $("#productModal").modal("hide");
             $("#addProductForm")[0].reset();
-            $("#product_id").val(""); // เคลียร์ ID หลังบันทึก
+            $("#product_id").val("");
             productTable.ajax.reload();
           } else {
             Swal.fire("เกิดข้อผิดพลาด", res.message, "error");
@@ -148,7 +115,7 @@ $(document).ready(function () {
       });
     });
 
-    // ระบบ Auto-complete ยี่ห้อ (พิมพ์ 3 ตัวขึ้นไป)
+    // ส่วนของ Brand Auto-complete (คงเดิม)
     $("#brand_input").on("keyup", function () {
       let term = $(this).val();
       let list = $("#brand_list");
@@ -175,7 +142,7 @@ $(document).ready(function () {
     });
   }
 
-  // === 3. ระบบเปลี่ยนรหัสผ่าน (Reset Password) ===
+  // === 3. ระบบเปลี่ยนรหัสผ่าน ===
   $("#resetPassForm").on("submit", function (e) {
     e.preventDefault();
     if ($("#new_password").val() !== $("#confirm_password").val()) {
@@ -188,7 +155,14 @@ $(document).ready(function () {
       data: $(this).serialize(),
       success: function (res) {
         if (res.status === "success") {
-          Swal.fire("สำเร็จ!", res.message, "success").then(() => {
+          // ปรับปรุง: หายไปเองใน 1 วินาที
+          Swal.fire({
+            icon: "success",
+            title: "สำเร็จ!",
+            text: res.message,
+            timer: 1000,
+            showConfirmButton: false,
+          }).then(() => {
             $("#resetPassForm")[0].reset();
           });
         } else {
@@ -199,7 +173,7 @@ $(document).ready(function () {
   });
 });
 
-// === ฟังก์ชัน Global (เรียกใช้จาก onclick ใน HTML) ===
+// === ฟังก์ชัน Global ===
 
 function editProduct(id) {
   $.getJSON(`api/product_api.php?action=get&id=${id}`, function (res) {
@@ -212,16 +186,14 @@ function editProduct(id) {
       $('input[name="model"]').val(p.model);
       $('input[name="price"]').val(p.price);
       $('input[name="unit"]').val(p.unit);
+
       let specValue = p.specifications;
       try {
-        // ลองตรวจสอบว่าเป็น JSON หรือไม่
         let specObj = JSON.parse(p.specifications);
-        // ถ้าเป็น Object และมี key ชื่อ detail ให้ดึงค่าออกมา
         if (typeof specObj === "object" && specObj !== null && specObj.detail) {
           specValue = specObj.detail;
         }
       } catch (e) {
-        // ถ้าไม่ใช่ JSON (เช่นเป็นข้อความธรรมดา) ให้ใช้ค่าเดิม
         specValue = p.specifications;
       }
       $('textarea[name="specifications"]').val(specValue);
@@ -248,7 +220,14 @@ function deleteProduct(id) {
         { id: id },
         function (res) {
           if (res.status === "success") {
-            Swal.fire("ลบแล้ว!", "ข้อมูลถูกลบออกจากระบบ", "success");
+            // ปรับปรุง: หายไปเองใน 1 วินาที
+            Swal.fire({
+              icon: "success",
+              title: "ลบแล้ว!",
+              text: "ข้อมูลถูกลบออกจากระบบ",
+              timer: 1000,
+              showConfirmButton: false,
+            });
             $("#productTable").DataTable().ajax.reload();
           }
         },
@@ -272,7 +251,14 @@ function deleteCat(id) {
         { id: id },
         function (res) {
           if (res.status === "success") {
-            Swal.fire("สำเร็จ", "หมวดหมู่ถูกลบแล้ว", "success");
+            // ปรับปรุง: หายไปเองใน 1 วินาที
+            Swal.fire({
+              icon: "success",
+              title: "สำเร็จ",
+              text: "หมวดหมู่ถูกลบแล้ว",
+              timer: 1000,
+              showConfirmButton: false,
+            });
             $("#catTable").DataTable().ajax.reload();
           }
         },
@@ -282,12 +268,18 @@ function deleteCat(id) {
   });
 }
 
-// ฟังก์ชันกู้คืนข้อมูล
 function restoreProduct(id) {
   $.post("api/product_api.php?action=restore", { id: id }, function (res) {
     if (res.status === "success") {
-      Swal.fire("กู้คืนแล้ว", "รายการสินค้ากลับมาใช้งานได้ปกติ", "success");
-      productTable.ajax.reload();
+      // ปรับปรุง: หายไปเองใน 1 วินาที
+      Swal.fire({
+        icon: "success",
+        title: "กู้คืนแล้ว",
+        text: "รายการสินค้ากลับมาใช้งานได้ปกติ",
+        timer: 1000,
+        showConfirmButton: false,
+      });
+      $("#productTable").DataTable().ajax.reload();
     }
   });
 }
