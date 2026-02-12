@@ -9,7 +9,7 @@ $brands = $pdo->query("SELECT * FROM brands")->fetchAll();
 
 <div id="page-content-wrapper" class="w-100">
     <nav class="navbar navbar-light bg-white border-bottom px-4 py-3">
-        <span class="navbar-brand mb-0 h1">รายการอุปกรณ์คอมพิวเตอร์</span>
+        <span class="navbar-brand mb-0 h1">รายการสินค้า</span>
     </nav>
     <div class="container-fluid p-4">
         <div class="card shadow-sm border-0">
@@ -95,4 +95,11 @@ $brands = $pdo->query("SELECT * FROM brands")->fetchAll();
     </div>
 </div>
 
+<div class="modal fade" id="productDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0">
+            <div id="modal-content-area"></div>
+        </div>
+    </div>
+</div>
 <?php require_once 'includes/footer.php'; ?>

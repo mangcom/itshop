@@ -50,28 +50,51 @@ $(document).ready(function () {
     let productTable = $("#productTable").DataTable({
       ajax: "api/product_api.php?action=list_all",
       columns: [
-        { data: "image_path", render: (data) => (data ? `<img src="../${data}" width="50">` : "ไม่มีรูป") },
+        { data: "image_path", render: (data) => (data ? `<img src="../${data}" width="50" class="img-thumbnail">` : "ไม่มีรูป") },
         { data: "brand_name" },
         { data: "version" },
         { data: "model" },
         { data: "category_name" },
-        { data: "price", render: (data) => parseFloat(data).toLocaleString() },
+        { data: "price", render: (data) => "<strong>" + parseFloat(data).toLocaleString() + "</strong>" },
         {
           data: "deleted_at",
           render: function (data) {
-            return data ? `<span class="badge bg-danger">ถูกลบเมื่อ ${data}</span>` : `<span class="badge bg-success">ปกติ</span>`;
+            return data ? `<span class="badge bg-danger">ถูกลบ</span>` : `<span class="badge bg-success">ปกติ</span>`;
           },
         },
         {
           data: null,
+          orderable: false,
+          className: "text-center",
           render: function (data) {
             if (data.deleted_at) {
-              return `<button class="btn btn-sm btn-info" onclick="restoreProduct(${data.id})"><i class="bi bi-arrow-counterclockwise"></i> กู้คืน</button>`;
+              return `<button class="btn btn-sm btn-info text-white" onclick="restoreProduct(${data.id})"><i class="bi bi-arrow-counterclockwise"></i> กู้คืน</button>`;
             }
+
+            // เช็คไฟล์ PDF (ไอคอนสีแดง)
+            let pdfBtn = data.datasheet_path
+              ? `<a href="../${data.datasheet_path}" target="_blank" class="text-danger mx-1" title="เปิด PDF">
+                 <i class="bi bi-file-earmark-pdf-fill fs-5"></i>
+               </a>`
+              : "";
+
             return `
-                    <button class="btn btn-sm btn-warning" onclick="editProduct(${data.id})"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteProduct(${data.id})"><i class="bi bi-trash"></i></button>
-                `;
+            <div class="d-flex align-items-center justify-content-center">
+                <a href="javascript:void(0)" class="text-primary mx-1" onclick="viewDetailAdmin(${data.id})" title="ดูรายละเอียด">
+                    <i class="bi bi-info-circle-fill fs-5"></i>
+                </a>
+                
+                ${pdfBtn}
+
+                <a href="javascript:void(0)" class="text-warning mx-1" onclick="editProduct(${data.id})" title="แก้ไขข้อมูล">
+                    <i class="bi bi-pencil-fill fs-5"></i>
+                </a>
+
+                <a href="javascript:void(0)" class="text-danger mx-1" onclick="deleteProduct(${data.id})" title="ลบสินค้า">
+                    <i class="bi bi-trash-fill fs-5"></i>
+                </a>
+            </div>
+        `;
           },
         },
       ],
@@ -81,6 +104,7 @@ $(document).ready(function () {
         [2, "asc"],
         [3, "asc"],
       ],
+      language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/th.json" },
     });
 
     // บันทึก/แก้ไขสินค้า
@@ -280,6 +304,61 @@ function restoreProduct(id) {
         showConfirmButton: false,
       });
       $("#productTable").DataTable().ajax.reload();
+    }
+  });
+}
+function viewDetailAdmin(id) {
+  $.getJSON(`api/product_api.php?action=get&id=${id}`, function (res) {
+    if (res.status === "success") {
+      let p = res.data;
+
+      // จัดการ Bullet Points ใน Specifications
+      let specHtml = "<li>ไม่มีข้อมูลเพิ่มเติม</li>";
+      if (p.specifications) {
+        try {
+          let specObj = JSON.parse(p.specifications);
+          let rawText = specObj.detail || p.specifications;
+          let lines = rawText
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0);
+          if (lines.length > 0) {
+            specHtml = lines.map((line) => `<li style="padding-left: 1.5em; text-indent: -1em; margin-bottom: 5px;">- ${line}</li>`).join("");
+          }
+        } catch (e) {
+          specHtml = `<li>- ${p.specifications}</li>`;
+        }
+      }
+
+      let html = `
+        <div class="modal-header bg-light">
+            <h5 class="modal-title">ตัวอย่างการแสดงผล: ${p.brand_name}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row mb-4">
+                <div class="col-md-5 text-center">
+                    <img src="../${p.image_path || "assets/img/no-image.png"}" class="img-fluid rounded shadow-sm" style="max-height: 250px; object-fit: contain;">
+                </div>
+                <div class="col-md-7">
+                    <h4 class="text-primary fw-bold">${p.brand_name}</h4>
+                    <h5 class="text-secondary">${p.version}</h5>
+                    <p class="text-muted mb-1">Model: <code>${p.model}</code></p>
+                    <p class="text-muted mb-1">ประเภท: <strong>${p.category_name}</strong></p>
+                    <h3 class="text-danger fw-bold mt-3">฿${parseFloat(p.price).toLocaleString()}</h3>
+                </div>
+            </div>
+            <hr>
+            <h6 class="fw-bold"><i class="bi bi-list-ul"></i> คุณสมบัติสินค้า:</h6>
+            <ul class="list-unstyled mt-2" style="line-height: 1.6; color: #444;">${specHtml}</ul>
+        </div>
+        <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button>
+            ${p.datasheet_path ? `<a href="../${p.datasheet_path}" target="_blank" class="btn btn-danger"><i class="bi bi-file-earmark-pdf"></i> ดู Datasheet (PDF)</a>` : ""}
+        </div>`;
+
+      $("#modal-content-area").html(html); // ใช้ ID เดียวกับหน้าบ้านได้ถ้ามี HTML รองรับ
+      $("#productDetailModal").modal("show");
     }
   });
 }

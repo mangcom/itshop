@@ -28,7 +28,7 @@ $cats = $pdo->query("SELECT * FROM categories ORDER BY category_name ASC")->fetc
         <div class="card border-0 shadow-sm p-4">
             <div class="row mb-4 align-items-center">
                 <div class="col-md-6">
-                    <h4 class="mb-0">รายการอุปกรณ์คอมพิวเตอร์</h4>
+                    <h4 class="mb-0">รายการสินค้า</h4>
                 </div>
                 <div class="col-md-3 ms-auto text-end">
                     <label class="form-label small">กรองตามประเภท:</label>
@@ -64,6 +64,10 @@ $cats = $pdo->query("SELECT * FROM categories ORDER BY category_name ASC")->fetc
                 <div id="modal-content-area"></div>
             </div>
         </div>
+    </div>
+
+    <div id="image-preview-popup" class="shadow rounded" style="display: none; position: absolute; z-index: 1055; background: #fff; padding: 5px; border: 1px solid rgba(0,0,0,0.1);">
+        <img src="" style="max-width: 300px; max-height: 300px; object-fit: contain; display: block;" class="rounded">
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
