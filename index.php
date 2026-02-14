@@ -11,20 +11,22 @@ $cats = $pdo->query("SELECT * FROM categories ORDER BY category_name ASC")->fetc
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
 <body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark sticky-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="index.php">IT SHOP</a>
-            <a href="cart.php" class="btn btn-primary position-relative">
-                <i class="bi bi-cart3"></i> ตะกร้าของฉัน
-                <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-            </a>
-        </div>
-    </nav>
+    <div class="container-fluid px-5 mt-4">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+            <div class="container-fluid px-3">
+                <a class="navbar-brand fw-bold" href="index.php">IT SHOP</a>
+                <a href="cart.php" class="btn btn-primary position-relative">
+                    <i class="bi bi-cart3"></i> ตะกร้าของฉัน
+                    <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                </a>
+            </div>
+        </nav>
 
-    <div class="container mt-4">
+
         <div class="card border-0 shadow-sm p-4">
             <div class="row mb-4 align-items-center">
                 <div class="col-md-6">

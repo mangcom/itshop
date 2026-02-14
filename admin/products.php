@@ -11,7 +11,7 @@ $brands = $pdo->query("SELECT * FROM brands")->fetchAll();
     <nav class="navbar navbar-light bg-white border-bottom px-4 py-3">
         <span class="navbar-brand mb-0 h1">รายการสินค้า</span>
     </nav>
-    <div class="container-fluid p-4">
+    <div class="container-fluid px-5 p-4">
         <div class="card shadow-sm border-0">
             <div class="card-body">
                 <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#productModal">

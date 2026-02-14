@@ -1,0 +1,11 @@
+/* ปรับแต่งความกว้างของ Container */
+.custom-container {
+  width: 95%; /* ใช้พื้นที่ 95% ของหน้าจอ */
+  max-width: 1600px; /* แต่ไม่เกิน 1600px เพื่อความสวยงาม */
+  margin: 0 auto; /* จัดให้อยู่กึ่งกลาง */
+}
+
+/* ปรับแต่งตารางให้ขยายเต็มพื้นที่ */
+#customerProductTable {
+  width: 100% !important;
+}

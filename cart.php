@@ -7,25 +7,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style>
-        .img-cart {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-
-        .total-row {
-            background-color: #f8f9fa;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-    </style>
-
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
 <body class="bg-light p-4">
-    <div class="container">
+    <div class="container-fluid px-5 mt-4">
         <div class="card shadow-sm border-0 p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4><i class="bi bi-cart3"></i> ตะกร้าสินค้าของคุณ</h4>

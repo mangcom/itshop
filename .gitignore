@@ -1,3 +1,7 @@
 .env
 docs/other
 .DS_Store
+/uploads/docs/*
+/uploads/images/*
+/database/backups/*
+
