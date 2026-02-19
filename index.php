@@ -4,7 +4,7 @@ $cats = $pdo->query("SELECT * FROM categories ORDER BY category_name ASC")->fetc
 ?>
 <!DOCTYPE html>
 <html lang="th">
-
+<!--  -->
 <head>
     <meta charset="UTF-8">
     <title>IT Shop - รายการสินค้า</title>
