@@ -1,2 +1,2 @@
 <?php
-echo "Test Git Work flow";
+echo "Test Git Work";
